@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 
 const config = require('./utils/config');
 const logger = require('./utils/logger');
+const middleware = require('./utils/middleware');
 
 const blogSchema = new mongoose.Schema({
   title: String,
@@ -40,5 +41,8 @@ app.post('/api/blogs', (request, response) => {
       response.status(201).json(result);
     });
 });
+
+app.use(middleware.unknownEndpoint);
+app.use(middleware.errorHandler);
 
 module.exports = app;
