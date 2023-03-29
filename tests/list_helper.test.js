@@ -40,3 +40,16 @@ describe('total likes', () => {
     expect(result).toBe(3);
   });
 });
+
+describe('blog with most likes', () => {
+  test('blog with the most likes', () => {
+    const blogs = [
+      { title: "A", author: "A", url: "www", likes: 1 },
+      { title: "B", author: "B", url: "www", likes: 10 },
+      { title: "C", author: "C", url: "www", likes: 5 }
+    ];
+
+    const result = listHelper.favoriteBlog(blogs);
+    expect(result).toEqual(blogs[1]);
+  });
+});

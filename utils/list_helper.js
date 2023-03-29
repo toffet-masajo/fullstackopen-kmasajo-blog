@@ -12,4 +12,19 @@ const totalLikes = (blogs) => {
     : blogs.reduce(reducer, 0);
 };
 
-module.exports = { dummy, totalLikes };
+const favoriteBlog = (blogs) => {
+  let winner = null;
+  let highestLikes = 0;
+
+  blogs.map(blog => {
+    if(blog.likes > highestLikes) {
+      highestLikes = blog.likes;
+      winner = blog;
+    }
+    return blog;
+  });
+
+  return winner;
+};
+
+module.exports = { dummy, totalLikes, favoriteBlog };
