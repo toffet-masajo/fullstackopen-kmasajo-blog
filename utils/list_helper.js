@@ -48,4 +48,27 @@ const mostBlogs = (blogs) => {
   return winner;
 };
 
-module.exports = { dummy, totalLikes, favoriteBlog, mostBlogs };
+const mostLikes = (blogs) => {
+  let highest = 0;
+  let winner = { author: '', likes: 0 };
+  let authorList = {};
+
+  const authors = _.groupBy(blogs, 'author');
+  _.forEach(authors, function(blogList, author) {
+    const totalLikes = blogList.reduce((total, blog) => {
+      return total + blog.likes
+    }, 0);
+    authorList[author] = totalLikes;
+  });
+  _.forEach(authorList, function(value, key) {
+    if(value > highest) {
+      highest = value;
+      winner.author = key;
+      winner.likes = value;
+    }
+  });
+
+  return winner;
+};
+
+module.exports = { dummy, totalLikes, favoriteBlog, mostBlogs, mostLikes };
