@@ -17,6 +17,12 @@ test('4.8 there are four blogs', async () => {
   expect(response.body).toHaveLength(4);
 });
 
+test('4.9 id exists', async () => {
+  const { body } = await api.get('/api/blogs');
+
+  expect(body[0].id).toBeDefined();
+});
+
 afterAll(async () => {
   await mongoose.connection.close();
 });
