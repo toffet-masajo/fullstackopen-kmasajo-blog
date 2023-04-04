@@ -86,6 +86,24 @@ test('4.10 test POST route', async () => {
   expect(blogTitles).toContain(newBlog.title);
 });
 
+test('4.11 likes attribute missing', async () => {
+  const initialLength = initialBlogs.length;
+  const newBlog = {
+    'title': 'Blog Title #5',
+    'author': 'Blog Author #5',
+    'url': 'http://www.blog5.com',
+  };
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/);
+
+  const { body } = await api.get('/api/blogs');
+  expect(body[initialLength].likes).toBeDefined();
+});
+
 afterAll(async () => {
   await mongoose.connection.close();
 });
