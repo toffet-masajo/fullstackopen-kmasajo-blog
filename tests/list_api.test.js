@@ -104,6 +104,32 @@ test('4.11 likes attribute missing', async () => {
   expect(body[initialLength].likes).toBeDefined();
 });
 
+test('4.12 title attribute missing', async () => {
+  const newBlog = {
+    'author': 'Blog Author #5',
+    'url': 'http://www.blog5.com',
+    'likes': 5,
+  };
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400);
+});
+
+test('4.12 url attribute missing', async () => {
+  const newBlog = {
+    'title': 'Blog Title #5',
+    'author': 'Blog Author #5',
+    'likes': 5,
+  };
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400);
+});
+
 afterAll(async () => {
   await mongoose.connection.close();
 });
