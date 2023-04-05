@@ -1,35 +1,10 @@
 const mongoose = require('mongoose');
 const supertest = require('supertest');
-const app = require('../app');
-const Blog = require('../models/blogs');
-const api = supertest(app);
 
-const initialBlogs = [
-  {
-    'title': 'Blog Title #1',
-    'author': 'Blog Author #1',
-    'url': 'http://www.blog1.com',
-    'likes': 1,
-  },
-  {
-    'title': 'Blog Title #2',
-    'author': 'Blog Author #2',
-    'url': 'http://www.blog2.com',
-    'likes': 2,
-  },
-  {
-    'title': 'Blog Title #3',
-    'author': 'Blog Author #3',
-    'url': 'http://www.blog3.com',
-    'likes': 3,
-  },
-  {
-    'title': 'Blog Title #4',
-    'author': 'Blog Author #4',
-    'url': 'http://www.blog4.com',
-    'likes': 4,
-  }
-];
+const { initialBlogs, blogsInDb } = require('./test_helper');
+const Blog = require('../models/blogs');
+const app = require('../app');
+const api = supertest(app);
 
 beforeEach( async () => {
   let blogObj;
@@ -127,6 +102,27 @@ test('4.12 url attribute missing', async () => {
   await api
     .post('/api/blogs')
     .send(newBlog)
+    .expect(400);
+});
+
+test('4.13 delete existing blog entry', async () => {
+  const oldBlogs = await blogsInDb();
+  const blogToDelete = oldBlogs[0];
+
+  await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .expect(204);
+
+  const newBlogs = await blogsInDb();
+  expect(newBlogs).toHaveLength(oldBlogs.length - 1);
+});
+
+test('4.13 delete non-existing blog entry', async () => {
+  const oldBlogs = await blogsInDb();
+  const blogToDelete = '123456789abcdef123456789';
+
+  await api
+    .delete(`/api/blogs/${blogToDelete}`)
     .expect(400);
 });
 

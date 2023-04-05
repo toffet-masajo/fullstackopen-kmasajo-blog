@@ -56,7 +56,7 @@ const mostLikes = (blogs) => {
   const authors = _.groupBy(blogs, 'author');
   _.forEach(authors, function(blogList, author) {
     const totalLikes = blogList.reduce((total, blog) => {
-      return total + blog.likes
+      return total + blog.likes;
     }, 0);
     authorList[author] = totalLikes;
   });

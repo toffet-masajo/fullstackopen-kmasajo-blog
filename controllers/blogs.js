@@ -7,6 +7,12 @@ router.get('/', async (request, response) => {
   response.json(blogs);
 });
 
+router.get('/:id', async (request, response) => {
+  const result = await Blog.findById(request.params.id);
+  if(result === null) response.status(400).json({ error: 'blog not found' });
+  else response.status(200).json(result);
+});
+
 router.post('/', async (request, response) => {
   const body = request.body;
   if(!('likes' in body))
@@ -20,6 +26,12 @@ router.post('/', async (request, response) => {
     const result = await blog.save();
     response.status(201).json(result);
   }
+});
+
+router.delete('/:id', async (request, response) => {
+  const result = await Blog.findByIdAndRemove(request.params.id);
+  if(result === null) response.status(400).json({ error: 'blog not found' });
+  else response.status(204).json({ message: 'blog deleted' });
 });
 
 module.exports = router;
