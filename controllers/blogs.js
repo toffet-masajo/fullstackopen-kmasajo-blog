@@ -17,7 +17,8 @@ router.post('/', async (request, response) => {
   const body = request.body;
   if(!('likes' in body))
     body.likes = 0;
-  else if(!('title' in body))
+
+  if(!('title' in body))
     response.status(400).json({ error: 'title missing' });
   else if(!('url' in body))
     response.status(400).json({ error: 'url missing' });
@@ -26,6 +27,12 @@ router.post('/', async (request, response) => {
     const result = await blog.save();
     response.status(201).json(result);
   }
+});
+
+router.put('/:id', async (request, response) => {
+  const result = await Blog.findByIdAndUpdate(request.params.id, request.body, { new: true, context: 'query' });
+  if(result === null) response.status(400).json({ error: 'blog not found' });
+  else response.json(result);
 });
 
 router.delete('/:id', async (request, response) => {
