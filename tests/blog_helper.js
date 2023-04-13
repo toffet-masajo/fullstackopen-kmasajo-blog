@@ -1,5 +1,4 @@
 const Blog = require('../models/blogs');
-
 const emptyBlog = [];
 
 const oneBlog = [
