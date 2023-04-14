@@ -4,13 +4,6 @@ const router = require('express').Router();
 const Blog = require('../models/blogs');
 const User = require('../models/users');
 
-const getTokenFrom = request => {
-  const auth = request.get('authorization');
-  if( auth && auth.startsWith('Bearer '))
-    return auth.replace('Bearer ', '');
-  return null;
-};
-
 router.get('/', async (request, response, next) => {
   try {
     const blogs = await Blog.find({}).populate('user');
@@ -31,33 +24,31 @@ router.post('/', async (request, response, next) => {
   if(!('likes' in body))
     body.likes = 0;
   if(!('title' in body))
-    response.status(400).json({ error: 'title missing' });
+    return response.status(400).json({ error: 'title missing' });
   else if(!('url' in body))
-    response.status(400).json({ error: 'url missing' });
-  else {
-    try {
-      const token = jwt.verify(getTokenFrom(request), process.env.SECRET);
-      if(!token.id)
-        return response.status(401).json({ error: 'invalid token' });
+    return response.status(400).json({ error: 'url missing' });
+  try {
+    const token = jwt.verify(request.token, process.env.SECRET);
+    if(!token.id)
+      return response.status(401).json({ error: 'invalid token' });
 
-      const user = await User.findById(token.id);
+    const user = await User.findById(token.id);
 
-      const blog = new Blog({
-        title: body.title,
-        author: body.author,
-        url: body.url,
-        likes: body.likes,
-        user: user._id.toString()
-      });
+    const blog = new Blog({
+      title: body.title,
+      author: body.author,
+      url: body.url,
+      likes: body.likes,
+      user: user._id.toString()
+    });
 
-      const result = await blog.save();
-      user.blogs = user.blogs.concat(result._id);
-      await user.save();
+    const result = await blog.save();
+    user.blogs = user.blogs.concat(result._id);
+    await user.save();
 
-      response.status(201).json(result);
-    } catch (error) {
-      next(error);
-    }
+    response.status(201).json(result);
+  } catch (error) {
+    next(error);
   }
 });
 
