@@ -1,10 +1,15 @@
 const router = require('express').Router();
 
 const Blog = require('../models/blogs');
+const User = require('../models/users');
 
-router.get('/', async (request, response) => {
-  const blogs = await Blog.find({});
-  response.json(blogs);
+router.get('/', async (request, response, next) => {
+  try {
+    const blogs = await Blog.find({}).populate('user');
+    response.json(blogs);
+  } catch (error) {
+    next(error);
+  }
 });
 
 router.get('/:id', async (request, response) => {
@@ -13,19 +18,34 @@ router.get('/:id', async (request, response) => {
   else response.status(200).json(result);
 });
 
-router.post('/', async (request, response) => {
+router.post('/', async (request, response, next) => {
   const body = request.body;
   if(!('likes' in body))
     body.likes = 0;
-
   if(!('title' in body))
     response.status(400).json({ error: 'title missing' });
   else if(!('url' in body))
     response.status(400).json({ error: 'url missing' });
   else {
-    const blog = new Blog(body);
-    const result = await blog.save();
-    response.status(201).json(result);
+    try {
+      const user = await User.findOne();
+
+      const blog = new Blog({
+        title: body.title,
+        author: body.author,
+        url: body.url,
+        likes: body.likes,
+        user: user._id.toString()
+      });
+
+      const result = await blog.save();
+      user.blogs = user.blogs.concat(result._id);
+      await user.save();
+
+      response.status(201).json(result);
+    } catch (error) {
+      next(error);
+    }
   }
 });
 

@@ -9,7 +9,13 @@ const userSchema = new mongoose.Schema({
     unique: [true, 'username already taken']
   },
   name: String,
-  passwordHash: String
+  passwordHash: String,
+  blogs: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Blog'
+    }
+  ]
 });
 
 userSchema.set('toJSON', {
@@ -18,6 +24,12 @@ userSchema.set('toJSON', {
     delete returnedObject._id;
     delete returnedObject.__v;
     delete returnedObject.passwordHash;
+
+    returnedObject.blogs =
+      returnedObject.blogs.map( blog => {
+        delete blog.user;
+        return blog;
+      });
   }
 });
 
