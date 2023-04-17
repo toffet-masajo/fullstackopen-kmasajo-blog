@@ -58,10 +58,35 @@ router.put('/:id', async (request, response) => {
   else response.json(result);
 });
 
-router.delete('/:id', async (request, response) => {
-  const result = await Blog.findByIdAndRemove(request.params.id);
-  if(result === null) response.status(400).json({ error: 'blog not found' });
-  else response.status(204).json({ message: 'blog deleted' });
+router.delete('/:id', async (request, response, next) => {
+  try
+  {
+    const blogToDelete = await Blog.findById(request.params.id);
+    if(blogToDelete === null)
+      return response.status(400).json({ error: 'blog not found' });
+
+    const token = jwt.verify(request.token, process.env.SECRET);
+    if(!token) return response.status(401).json({ error: 'invalid token' });
+
+    const user = await User.findById(token.id);
+    if(!user) return response(401).json({ error: 'unknown user' });
+
+    if(token.id !== blogToDelete.user.toString())
+      return response.status(401).json({ error: 'unauthorized access' });
+
+    const updatedUser = {
+      username: user.username,
+      name: user.name,
+      passwordHash: user.passwordHash,
+      blogs: user.blogs.filter(blog => blog.toString() !== request.params.id)
+    };
+
+    await Blog.findByIdAndRemove(request.params.id);
+    await User.findByIdAndUpdate(token.id, updatedUser, { new: true, context: 'query' });
+    return response.status(204).json({ message: 'blog deleted' });
+  } catch (error) {
+    next(error);
+  }
 });
 
 module.exports = router;
