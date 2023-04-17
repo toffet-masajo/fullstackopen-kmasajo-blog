@@ -1,4 +1,3 @@
-const jwt = require('jsonwebtoken');
 const router = require('express').Router();
 
 const Blog = require('../models/blogs');
@@ -20,6 +19,9 @@ router.get('/:id', async (request, response) => {
 });
 
 router.post('/', async (request, response, next) => {
+  const user = request.user;
+  if(!user) return response.status(401).json({ error: 'unauthorized access' });
+
   const body = request.body;
   if(!('likes' in body))
     body.likes = 0;
@@ -28,12 +30,6 @@ router.post('/', async (request, response, next) => {
   else if(!('url' in body))
     return response.status(400).json({ error: 'url missing' });
   try {
-    const token = jwt.verify(request.token, process.env.SECRET);
-    if(!token.id)
-      return response.status(401).json({ error: 'invalid token' });
-
-    const user = await User.findById(token.id);
-
     const blog = new Blog({
       title: body.title,
       author: body.author,
@@ -65,13 +61,11 @@ router.delete('/:id', async (request, response, next) => {
     if(blogToDelete === null)
       return response.status(400).json({ error: 'blog not found' });
 
-    const token = jwt.verify(request.token, process.env.SECRET);
-    if(!token) return response.status(401).json({ error: 'invalid token' });
-
-    const user = await User.findById(token.id);
+    const user = request.user;
     if(!user) return response(401).json({ error: 'unknown user' });
 
-    if(token.id !== blogToDelete.user.toString())
+    const userId = user._id.toString();
+    if(userId !== blogToDelete.user.toString())
       return response.status(401).json({ error: 'unauthorized access' });
 
     const updatedUser = {
@@ -82,7 +76,7 @@ router.delete('/:id', async (request, response, next) => {
     };
 
     await Blog.findByIdAndRemove(request.params.id);
-    await User.findByIdAndUpdate(token.id, updatedUser, { new: true, context: 'query' });
+    await User.findByIdAndUpdate(userId, updatedUser, { new: true, context: 'query' });
     return response.status(204).json({ message: 'blog deleted' });
   } catch (error) {
     next(error);
