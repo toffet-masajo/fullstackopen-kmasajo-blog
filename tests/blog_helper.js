@@ -1,4 +1,5 @@
 const Blog = require('../models/blogs');
+const User = require('../models/users');
 const emptyBlog = [];
 
 const oneBlog = [
@@ -68,4 +69,10 @@ const blogsInDb = async () => {
   return blogs.map(blog => blog.toJSON());
 };
 
-module.exports = { emptyBlog, oneBlog, allBlogs, blogsInDb };
+const getRandomUser = async () => {
+  const user = await User.findOne();
+  if(user) return user._id.toString();
+  return null;
+};
+
+module.exports = { emptyBlog, oneBlog, allBlogs, blogsInDb, getRandomUser };

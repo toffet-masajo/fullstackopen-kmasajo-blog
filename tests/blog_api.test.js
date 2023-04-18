@@ -1,14 +1,36 @@
+const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const supertest = require('supertest');
 
-const { allBlogs, blogsInDb } = require('./blog_helper');
+const { allBlogs, blogsInDb, getRandomUser } = require('./blog_helper');
 const Blog = require('../models/blogs');
+const User = require('../models/users');
 const app = require('../app');
 const api = supertest(app);
 
+beforeAll( async () => {
+  await User.deleteMany({});
+
+  const password = await bcrypt.hash('tester', 10);
+  const user = new User({ username: 'tester', name: 'tester', passwordHash: password });
+  await user.save();
+});
+
 beforeEach( async () => {
   await Blog.deleteMany({});
-  await Blog.insertMany(allBlogs);
+
+  const userId = await getRandomUser();
+  const blogObjects = allBlogs.map( blog => {
+    return {
+      title: blog.title,
+      author: blog.author,
+      url: blog.url,
+      likes: blog.likes,
+      user: userId
+    };
+  });
+
+  await Blog.insertMany(blogObjects);
 });
 
 describe('blogs exist', () => {
@@ -37,16 +59,24 @@ describe('blog id element check', () => {
 describe('adding new blog entry', () => {
   test('add valid entry', async () => {
     const oldBlogs = await blogsInDb();
+    const userId = await getRandomUser();
+
+    const response = await api
+      .post('/api/login')
+      .send({ username: 'tester', password: 'tester' });
+
     const initialLength = oldBlogs.length;
     const newBlog = {
       'title': 'Types and Tests',
       'author': 'Robert C. Martin',
       'url': 'http://blog.cleancoder.com/uncle-bob/2019/06/08/TestsAndTypes.html',
       'likes': 5,
+      'user': userId,
     };
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${response.body.token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/);
@@ -58,6 +88,24 @@ describe('adding new blog entry', () => {
     expect(blogTitles).toContain(newBlog.title);
   });
 
+  test('token not provided', async () => {
+    const userId = await getRandomUser();
+
+    const newBlog = {
+      'title': 'Types and Tests',
+      'author': 'Robert C. Martin',
+      'url': 'http://blog.cleancoder.com/uncle-bob/2019/06/08/TestsAndTypes.html',
+      'likes': 5,
+      'user': userId,
+    };
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(401)
+      .expect('Content-Type', /application\/json/);
+  });
+
   test('likes attribute missing', async () => {
     const oldBlogs = await blogsInDb();
     const initialLength = oldBlogs.length;
@@ -66,9 +114,13 @@ describe('adding new blog entry', () => {
       'author': 'Robert C. Martin',
       'url': 'http://blog.cleancoder.com/uncle-bob/2019/06/08/TestsAndTypes.html',
     };
+    const response = await api
+      .post('/api/login')
+      .send({ username: 'tester', password: 'tester' });
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${response.body.token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/);
@@ -83,9 +135,13 @@ describe('adding new blog entry', () => {
       'url': 'http://blog.cleancoder.com/uncle-bob/2019/06/08/TestsAndTypes.html',
       'likes': 5,
     };
+    const response = await api
+      .post('/api/login')
+      .send({ username: 'tester', password: 'tester' });
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${response.body.token}`)
       .send(newBlog)
       .expect(400);
   });
@@ -96,9 +152,13 @@ describe('adding new blog entry', () => {
       'author': 'Robert C. Martin',
       'likes': 5,
     };
+    const response = await api
+      .post('/api/login')
+      .send({ username: 'tester', password: 'tester' });
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${response.body.token}`)
       .send(newBlog)
       .expect(400);
   });
@@ -108,9 +168,13 @@ describe('deleting blog entry', () => {
   test('delete existing blog entry', async () => {
     const oldBlogs = await blogsInDb();
     const blogToDelete = oldBlogs[0];
+    const response = await api
+      .post('/api/login')
+      .send({ username: 'tester', password: 'tester' });
 
     await api
       .delete(`/api/blogs/${blogToDelete.id}`)
+      .set('Authorization', `Bearer ${response.body.token}`)
       .expect(204);
 
     const newBlogs = await blogsInDb();
