@@ -65,11 +65,40 @@ const App = () => {
     );
   };
 
+  const handleCreateBlog = async (event) => {
+    event.preventDefault();
+    const newBlog = {
+      title: event.target.title.value,
+      author: event.target.author.value,
+      url: event.target.url.value
+    };
+
+    const data = await blogService.createBlog(newBlog);
+    setBlogs(blogs.concat(data));
+  };
+
+  const newForm = () => {
+    return(
+      <div>
+        <h2>create new</h2>
+        <form onSubmit={handleCreateBlog}>
+          <div>
+            <div>title: <input type='text' name='title' /></div>
+            <div>author: <input type='text' name='author' /></div>
+            <div>url: <input type='text' name='url' /></div>
+            <div><button type='submit'>create</button></div>
+           </div>
+        </form>
+      </div>
+    )
+  };
+
   const blogForm = () => {
     return(
       <div>
         <h2>Blogs</h2>
         <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
+        {newForm()}
         {blogs.map(blog =>
           <Blog key={blog.id} blog={blog} />
         )}
