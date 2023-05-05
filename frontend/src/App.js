@@ -7,6 +7,7 @@ const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [visible, setVisible] = useState(false);
   const [user, setUser] = useState(null);
   const [message, setMessage] = useState({});
 
@@ -100,6 +101,7 @@ const App = () => {
     } catch (error) {
       setMessage({ message: 'error adding blog', type: 'ng'});
     } finally {
+      setVisible(false);
       setTimeout( () => setMessage(null), 5000 );
     }
   };
@@ -107,15 +109,21 @@ const App = () => {
   const newForm = () => {
     return(
       <div>
-        <h2>create new</h2>
-        <form onSubmit={handleCreateBlog}>
-          <div>
-            <div>title: <input type='text' name='title' /></div>
-            <div>author: <input type='text' name='author' /></div>
-            <div>url: <input type='text' name='url' /></div>
-            <div><button type='submit'>create</button></div>
-           </div>
-        </form>
+        <div style={{ display: visible ? '' : 'none' }}>
+          <h2>create new</h2>
+          <form onSubmit={handleCreateBlog}>
+            <div>
+              <div>title: <input type='text' name='title' /></div>
+              <div>author: <input type='text' name='author' /></div>
+              <div>url: <input type='text' name='url' /></div>
+              <div><button type='submit'>create</button></div>
+            </div>
+          </form>
+          <div><button onClick={ () => setVisible(false) }>cancel</button></div>
+        </div>
+        <div style={{ display: visible ? 'none' : '' }}>
+          <button onClick={ () => setVisible(true) }>new blog</button>
+        </div>
       </div>
     )
   };
