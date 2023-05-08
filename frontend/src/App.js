@@ -84,6 +84,8 @@ const App = () => {
   const handleCreateBlog = async (newBlog) => {
     try {
       const data = await blogService.createBlog(newBlog);
+      data.user = { username: user.username, name: user.name };
+      
       setBlogs(blogs.concat(data));
       setMessage({ 
         message: `a new blog ${newBlog.title} by ${newBlog.author} added`, 
