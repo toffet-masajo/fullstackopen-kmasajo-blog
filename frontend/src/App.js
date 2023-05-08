@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import Blog from './components/Blog';
+import NewBlogForm from './components/NewBlogForm';
+import Togglable from './components/Togglable';
 import blogService from './services/blogs';
 import loginService from './services/login';
 
@@ -7,7 +9,6 @@ const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [visible, setVisible] = useState(false);
   const [user, setUser] = useState(null);
   const [message, setMessage] = useState({});
 
@@ -47,6 +48,7 @@ const App = () => {
 
       window.localStorage.setItem('loggedUser', JSON.stringify(loggedUser));
       setUser(loggedUser);
+      blogService.setToken(loggedUser.token);
       setUsername('');
       setPassword('');
     } catch (error) {
@@ -79,18 +81,7 @@ const App = () => {
     );
   };
 
-  const handleCreateBlog = async (event) => {
-    event.preventDefault();
-    const newBlog = {
-      title: event.target.title.value,
-      author: event.target.author.value,
-      url: event.target.url.value
-    };
-
-    event.target.title.value = '';
-    event.target.author.value = '';
-    event.target.url.value = '';
-
+  const handleCreateBlog = async (newBlog) => {
     try {
       const data = await blogService.createBlog(newBlog);
       setBlogs(blogs.concat(data));
@@ -101,31 +92,8 @@ const App = () => {
     } catch (error) {
       setMessage({ message: 'error adding blog', type: 'ng'});
     } finally {
-      setVisible(false);
       setTimeout( () => setMessage(null), 5000 );
     }
-  };
-
-  const newForm = () => {
-    return(
-      <div>
-        <div style={{ display: visible ? '' : 'none' }}>
-          <h2>create new</h2>
-          <form onSubmit={handleCreateBlog}>
-            <div>
-              <div>title: <input type='text' name='title' /></div>
-              <div>author: <input type='text' name='author' /></div>
-              <div>url: <input type='text' name='url' /></div>
-              <div><button type='submit'>create</button></div>
-            </div>
-          </form>
-          <div><button onClick={ () => setVisible(false) }>cancel</button></div>
-        </div>
-        <div style={{ display: visible ? 'none' : '' }}>
-          <button onClick={ () => setVisible(true) }>new blog</button>
-        </div>
-      </div>
-    )
   };
 
   const blogForm = () => {
@@ -134,7 +102,9 @@ const App = () => {
         <h2>Blogs</h2>
         { message && messageForm() }
         <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
-        {newForm()}
+        <Togglable buttonLabel='new blog'>
+          <NewBlogForm handleCreate={handleCreateBlog} />
+        </Togglable>
         {blogs.map(blog =>
           <Blog key={blog.id} blog={blog} />
         )}
