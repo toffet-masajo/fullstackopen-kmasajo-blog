@@ -98,6 +98,23 @@ const App = () => {
     }
   };
 
+  const handleAddLike = async (updatedBlog) => {
+    try {
+      const data = await blogService.updateBlog(updatedBlog);
+      setBlogs(
+        blogs.map((blog) => {
+          if(blog.id === data.id) {
+            blog.likes = data.likes
+          }
+          return blog;
+        })
+      );
+    } catch (error) {
+      setMessage({ message: 'error updating blog', type: 'ng' });
+      setTimeout(() => setMessage(null), 5000);
+    } 
+  }
+
   const blogForm = () => {
     return(
       <div>
@@ -108,7 +125,7 @@ const App = () => {
           <NewBlogForm handleCreate={handleCreateBlog} />
         </Togglable>
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
+          <Blog key={blog.id} blog={blog} handleUpdate={handleAddLike}/>
         )}
       </div>
     );
