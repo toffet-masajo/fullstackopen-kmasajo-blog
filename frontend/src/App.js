@@ -14,7 +14,7 @@ const App = () => {
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
-      setBlogs( blogs )
+      setBlogs( blogs.sort((a, b) => a.likes - b.likes) )
     );
   }, []);
 
@@ -86,7 +86,11 @@ const App = () => {
       const data = await blogService.createBlog(newBlog);
       data.user = { username: user.username, name: user.name };
       
-      setBlogs(blogs.concat(data));
+      setBlogs(
+        blogs
+          .concat(data)
+          .sort((a, b) => a.likes - b.likes)
+      );
       setMessage({ 
         message: `a new blog ${newBlog.title} by ${newBlog.author} added`, 
         type: 'ok' 
@@ -102,12 +106,14 @@ const App = () => {
     try {
       const data = await blogService.updateBlog(updatedBlog);
       setBlogs(
-        blogs.map((blog) => {
-          if(blog.id === data.id) {
-            blog.likes = data.likes
-          }
-          return blog;
-        })
+        blogs
+          .map((blog) => {
+            if(blog.id === data.id) {
+              blog.likes = data.likes
+            }
+            return blog;
+          })
+          .sort((a, b) => a.likes - b.likes)
       );
     } catch (error) {
       setMessage({ message: 'error updating blog', type: 'ng' });
