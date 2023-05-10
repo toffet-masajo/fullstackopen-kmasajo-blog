@@ -1,15 +1,15 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 const Blog = ({ blog, user, handleUpdate, handleDelete }) => {
   const [visible, setVisible] = useState(false);
-  
+
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
     border: 'solid',
     borderWidth: 1,
     marginBottom: 5
-  }
+  };
 
   const handleLikeButton = (event) => {
     event.preventDefault();
@@ -29,7 +29,7 @@ const Blog = ({ blog, user, handleUpdate, handleDelete }) => {
         {blog.url}<br />
         {blog.likes} <button onClick={handleLikeButton}>like</button><br />
         {blog.user.name}<br />
-        { user === blog.user.username 
+        { user === blog.user.username
           ? <button onClick={handleDeleteButton}>remove</button>
           : null
         }

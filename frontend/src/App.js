@@ -61,10 +61,10 @@ const App = () => {
     event.preventDefault();
     setUser(null);
     window.localStorage.removeItem('loggedUser');
-  }
+  };
 
   const loginForm = () => {
-    return( 
+    return(
       <div>
         <h2>Log in to application</h2>
         { message && messageForm() }
@@ -85,18 +85,18 @@ const App = () => {
     try {
       const data = await blogService.createBlog(newBlog);
       data.user = { username: user.username, name: user.name };
-      
+
       setBlogs(
         blogs
           .concat(data)
           .sort((a, b) => a.likes - b.likes)
       );
-      setMessage({ 
-        message: `a new blog ${newBlog.title} by ${newBlog.author} added`, 
-        type: 'ok' 
+      setMessage({
+        message: `a new blog ${newBlog.title} by ${newBlog.author} added`,
+        type: 'ok'
       });
     } catch (error) {
-      setMessage({ message: 'error adding blog', type: 'ng'});
+      setMessage({ message: 'error adding blog', type: 'ng' });
     } finally {
       setTimeout( () => setMessage(null), 5000 );
     }
@@ -109,7 +109,7 @@ const App = () => {
         blogs
           .map((blog) => {
             if(blog.id === data.id) {
-              blog.likes = data.likes
+              blog.likes = data.likes;
             }
             return blog;
           })
@@ -118,8 +118,8 @@ const App = () => {
     } catch (error) {
       setMessage({ message: 'error updating blog', type: 'ng' });
       setTimeout(() => setMessage(null), 5000);
-    } 
-  }
+    }
+  };
 
   const handleRemoveBlog = async (blogId) => {
     try {
@@ -129,7 +129,7 @@ const App = () => {
       setMessage({ message: 'error deleting blog', type: 'ng' });
       setTimeout(() => setMessage(null), 5000);
     }
-  }
+  };
 
   const blogForm = () => {
     return(
@@ -141,17 +141,17 @@ const App = () => {
           <NewBlogForm handleCreate={handleCreateBlog} />
         </Togglable>
         {blogs.map(blog =>
-          <Blog 
-            key={blog.id} 
-            blog={blog} 
-            user={user.username} 
-            handleUpdate={handleAddLike} 
+          <Blog
+            key={blog.id}
+            blog={blog}
+            user={user.username}
+            handleUpdate={handleAddLike}
             handleDelete={handleRemoveBlog}
           />
         )}
       </div>
     );
-  }
+  };
 
   return (
     <div>

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import PropTypes from 'prop-types';
+import { useState } from 'react';
 
 const NewBlogForm = ({ handleCreate }) => {
   const [title, setTitle] = useState('');
@@ -7,7 +8,7 @@ const NewBlogForm = ({ handleCreate }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    handleCreate({ 
+    handleCreate({
       title: title,
       author: author,
       url: url
@@ -30,7 +31,11 @@ const NewBlogForm = ({ handleCreate }) => {
         </div>
       </form>
     </div>
-  )
+  );
+};
+
+NewBlogForm.propTypes = {
+  handleCreate: PropTypes.func.isRequired
 };
 
 export default NewBlogForm;
