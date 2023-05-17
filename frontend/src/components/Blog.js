@@ -23,7 +23,7 @@ const Blog = ({ blog, user, handleUpdate, handleDelete }) => {
   };
 
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className='blog'>
       {blog.title} {blog.author} <button onClick={() => setVisible(!visible)}>{visible ? 'hide' : 'view'}</button>
       <div style={{ display : visible ? '' : 'none' }}>
         {blog.url}<br />
