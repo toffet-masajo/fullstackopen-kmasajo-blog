@@ -52,3 +52,38 @@ test('renders likes and url after clicking view button', async () => {
   const blogDetails = container.querySelector('.blog-details');
   expect(blogDetails).toHaveTextContent('www.testurl.com');
 });
+
+test('click like button twice', async () => {
+  const blog = {
+    title: 'Test Title',
+    author: 'Test Author',
+    url: 'www.testurl.com',
+    likes: 0,
+    user: {
+      name: 'T.E. Ster',
+      username: 'tester'
+    }
+  };
+
+  const likeHandler = jest.fn();
+
+  const { container } = render(<Blog blog={blog} handleUpdate={likeHandler} />);
+
+  const user = userEvent.setup();
+  const viewButton = screen.getByText('view');
+
+  const blogBeforeClick = container.querySelector('.blog');
+  expect(blogBeforeClick).toHaveTextContent('view');
+
+  await user.click(viewButton);
+
+  const blogAfterClick = container.querySelector('.blog');
+  expect(blogAfterClick).toHaveTextContent('hide');
+
+  const likeButton = screen.getByText('like');
+
+  await user.click(likeButton);
+  await user.click(likeButton);
+
+  expect(likeHandler.mock.calls).toHaveLength(2);
+});
