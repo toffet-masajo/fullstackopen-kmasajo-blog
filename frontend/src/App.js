@@ -31,10 +31,10 @@ const App = () => {
     if( message === null ) return null;
     if( message.type === 'ok' )
       return (
-        <div><h2 style={{ color: 'green' }}>{ message.message }</h2></div>
+        <div className='success-message' style={{ color: 'green' }}><h2>{ message.message }</h2></div>
       );
     return (
-      <div><h2 style={{ color: 'red' }}>{ message.message }</h2></div>
+      <div className='error-message' style={{ color: 'red' }}><h2>{ message.message }</h2></div>
     );
   };
 
@@ -70,12 +70,12 @@ const App = () => {
         { message && messageForm() }
         <form onSubmit={handleLogin}>
           <div>
-            username <input type="text" value={username} name="Username" onChange={({ target }) => setUsername(target.value)} />
+            username <input id="username" type="text" value={username} name="Username" onChange={({ target }) => setUsername(target.value)} />
           </div>
           <div>
-            password <input type="password" value={password} name="Password" onChange={({ target }) => setPassword(target.value)} />
+            password <input id="password" type="password" value={password} name="Password" onChange={({ target }) => setPassword(target.value)} />
           </div>
-          <button type="submit">Login</button>
+          <button id="login-button" type="submit">Login</button>
         </form>
       </div>
     );
