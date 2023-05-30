@@ -39,19 +39,19 @@ describe('Blog app', () => {
   });
 
   describe('Blog Creation', function() {
+    const title = 'Bazinga! A Tale As Old As Time';
+    const author = 'S. Cooper';
+    const url = 'http://www.bazinga.com';
+
     beforeEach(function() {
-      cy.get('#username').type('tester');
-      cy.get('#password').type('tester');
-      cy.get('#login-button').click();
+      cy.login({ username: 'tester', password: 'tester' });
     });
 
     it('create new blog successfully', function() {
-      const title = 'Bazinga! A Tale As Old As Time';
-      const author = 'S. Cooper';
       cy.contains('new blog').click();
       cy.get('#blog-title').type(title);
       cy.get('#blog-author').type(author);
-      cy.get('#blog-url').type('http://www.bazinga.com');
+      cy.get('#blog-url').type(url);
       cy.get('#create-button').click();
 
       cy.get('.success-message')
@@ -61,12 +61,10 @@ describe('Blog app', () => {
     });
 
     it('like a blog', function() {
-      const title = 'Bazinga! A Tale As Old As Time';
-      const author = 'S. Cooper';
       cy.contains('new blog').click();
       cy.get('#blog-title').type(title);
       cy.get('#blog-author').type(author);
-      cy.get('#blog-url').type('http://www.bazinga.com');
+      cy.get('#blog-url').type(url);
       cy.get('#create-button').click();
 
       cy.contains(`${title} ${author}`).contains('view').click();
@@ -74,6 +72,25 @@ describe('Blog app', () => {
 
       cy.get('.blog')
         .should('contain', '1');
+    });
+  });
+
+  describe('Blog Deletion', function() {
+    const title = 'Bazinga! A Tale As Old As Time';
+    const author = 'S. Cooper';
+    const url = 'http://www.bazinga.com';
+
+    beforeEach(function() {
+      cy.login({ username: 'tester', password: 'tester' });
+      cy.createBlog({ title: title, author: author, url: url });
+    });
+
+    it('delete own blog', function() {
+      cy.contains(`${title} ${author}`)
+        .contains('view')
+        .click();
+      cy.get('.blog')
+        .should('contain', 'remove');
     });
   });
 });

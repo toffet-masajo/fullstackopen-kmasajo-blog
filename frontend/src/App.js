@@ -136,7 +136,7 @@ const App = () => {
       <div>
         <h2>Blogs</h2>
         { message && messageForm() }
-        <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
+        <p>{user.name} logged in <button id='logout-button' onClick={handleLogout}>logout</button></p>
         <Togglable buttonLabel='new blog'>
           <NewBlogForm handleCreate={handleCreateBlog} />
         </Togglable>
