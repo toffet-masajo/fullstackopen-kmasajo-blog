@@ -92,5 +92,15 @@ describe('Blog app', () => {
       cy.get('.blog')
         .should('contain', 'remove');
     });
+
+    it('cannot delete other blog', function() {
+      cy.get('#logout-button').click();
+      cy.login({ username: 'admin', password: 'admin' });
+      cy.contains(`${title} ${author}`)
+        .contains('view')
+        .click();
+      cy.get('.blog')
+        .should('not.contain', 'remove');
+    });
   });
 });
