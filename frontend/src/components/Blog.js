@@ -28,7 +28,7 @@ const Blog = ({ blog, user, handleUpdate, handleDelete }) => {
       { visible &&
         <div className='blog-details'>
           {blog.url}<br />
-          {blog.likes} <button onClick={handleLikeButton}>like</button><br />
+          {blog.likes} <button id='like-blog-button' onClick={handleLikeButton}>like</button><br />
           {blog.user.name}<br />
           { user === blog.user.username
             ? <button id='remove-blog-button' onClick={handleDeleteButton}>remove</button>

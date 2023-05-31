@@ -28,8 +28,16 @@ Cypress.Commands.add('createBlog', ({ title, author, url }) => {
     headers: {
       'Authorization': `Bearer ${JSON.parse(localStorage.getItem('loggedUser')).token}`
     }
-  });
+  }).then(() => cy.visit('http://localhost:3000'));
+});
+
+Cypress.Commands.add('addLike', ({ title, author }) => {
   cy.visit('http://localhost:3000');
+  cy.contains(`${title} ${author}`)
+    .contains('view')
+    .click();
+  cy.get('#like-blog-button').click();
+  cy.contains('hide').click();
 });
 //
 //
